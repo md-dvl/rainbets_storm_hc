@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:rainbets_storm_hc/screens/initial_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/events_screen.dart';
 import 'screens/profile_screen.dart';
@@ -36,7 +37,7 @@ class RainbetsStormApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const OnboardingScreen(),
+      home: const InitialScreen(),
       routes: {'/main': (context) => const MainTabScreen()},
       debugShowCheckedModeBanner: false,
     );

@@ -1,4 +1,4 @@
-package com.example.rainbets_storm_hc
+package com.gaminghub.rainbets_storm
 
 import io.flutter.embedding.android.FlutterActivity
 
