@@ -3,6 +3,7 @@ import 'screens/home_screen.dart';
 import 'screens/events_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/onboarding_screen.dart';
 import 'utils/colors.dart';
 
 void main() {
@@ -35,7 +36,8 @@ class RainbetsStormApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const MainTabScreen(),
+      home: const OnboardingScreen(),
+      routes: {'/main': (context) => const MainTabScreen()},
       debugShowCheckedModeBanner: false,
     );
   }

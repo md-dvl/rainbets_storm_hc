@@ -15,7 +15,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _stormController;
   int _selectedSegment = 0;
-  
+
   // Sample stats
   final int gamesPlayed = 42;
   final int notesWritten = 18;
@@ -23,6 +23,17 @@ class _ProfileScreenState extends State<ProfileScreen>
   final int strategiesCreated = 25;
   final int factsRead = 156;
   final int totalTime = 3420; // minutes
+
+  String _userName = 'User';
+  int _selectedOverlayIndex = 0;
+  double _overlayIntensity = 0.45;
+
+  final List<List<Color>> _overlayPalettes = [
+    [AppColors.mediumBlue, AppColors.deepNavy],
+    [const Color.fromRGBO(123, 125, 143, 1.0), AppColors.deepNavy],
+    [const Color.fromRGBO(95, 67, 178, 1.0), const Color.fromRGBO(34, 41, 120, 1.0)],
+    [const Color.fromRGBO(189, 191, 199, 1.0), const Color.fromRGBO(57, 59, 88, 1.0)],
+  ];
   
   @override
   void initState() {
@@ -37,6 +48,243 @@ class _ProfileScreenState extends State<ProfileScreen>
   void dispose() {
     _stormController.dispose();
     super.dispose();
+  }
+
+  LinearGradient _buildCurrentOverlayGradient(double? customIntensity, int? customIndex) {
+    final colors = _overlayPalettes[customIndex ?? _selectedOverlayIndex];
+    final intensity = customIntensity ?? _overlayIntensity;
+    return LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: colors
+          .map((color) => color.withOpacity(intensity.clamp(0.2, 0.9)))
+          .toList(),
+    );
+  }
+
+  void _showEditProfileSheet() {
+    final nameController = TextEditingController(text: _userName);
+    int tempOverlayIndex = _selectedOverlayIndex;
+    double tempIntensity = _overlayIntensity;
+
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+            return Padding(
+              padding: EdgeInsets.only(bottom: bottomInset),
+              child: Container(
+                height: 430,
+                decoration: BoxDecoration(
+                  gradient: AppColors.cardGradient,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  border: Border.all(
+                    color: AppColors.lightGrayAccent.withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: SafeArea(
+                  top: false,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Edit Profile',
+                              style: TextStyle(
+                                color: AppColors.whitePrimary,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              minSize: 0,
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Icon(
+                                CupertinoIcons.xmark_circle_fill,
+                                color: AppColors.lightGrayAccent,
+                                size: 26,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Display Name',
+                                style: TextStyle(
+                                  color: AppColors.lightGrayAccent,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              CupertinoTextField(
+                                controller: nameController,
+                                placeholder: 'Enter name',
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: AppColors.mediumBlue.withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: AppColors.lightGrayAccent.withOpacity(0.25),
+                                    width: 1,
+                                  ),
+                                ),
+                                style: const TextStyle(
+                                  color: AppColors.whitePrimary,
+                                  fontSize: 16,
+                                ),
+                                placeholderStyle: TextStyle(
+                                  color: AppColors.lightGrayAccent.withOpacity(0.5),
+                                ),
+                              ),
+                              const SizedBox(height: 18),
+                              const Text(
+                                'Avatar Overlay',
+                                style: TextStyle(
+                                  color: AppColors.lightGrayAccent,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                height: 70,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: _overlayPalettes.length,
+                                  itemBuilder: (context, index) {
+                                    final gradient = _buildCurrentOverlayGradient(tempIntensity, index);
+                                    final isSelected = tempOverlayIndex == index;
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setSheetState(() => tempOverlayIndex = index);
+                                      },
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 250),
+                                        margin: EdgeInsets.only(
+                                          right: index == _overlayPalettes.length - 1 ? 0 : 14,
+                                        ),
+                                        width: 60,
+                                        decoration: BoxDecoration(
+                                          gradient: gradient,
+                                          borderRadius: BorderRadius.circular(16),
+                                          border: Border.all(
+                                            color: isSelected
+                                                ? AppColors.whitePrimary
+                                                : AppColors.lightGrayAccent.withOpacity(0.2),
+                                            width: isSelected ? 2 : 1,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: AppColors.mediumBlue.withOpacity(0.3),
+                                              blurRadius: 12,
+                                              offset: const Offset(0, 6),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  padding: EdgeInsets.zero,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    'Overlay Intensity',
+                                    style: TextStyle(
+                                      color: AppColors.lightGrayAccent,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${(tempIntensity * 100).round()}%',
+                                    style: TextStyle(
+                                      color: AppColors.lightGrayAccent.withOpacity(0.8),
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              CupertinoSlider(
+                                value: tempIntensity,
+                                min: 0.2,
+                                max: 0.8,
+                                onChanged: (value) {
+                                  setSheetState(() => tempIntensity = value);
+                                },
+                                activeColor: AppColors.lightGrayAccent,
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: CupertinoButton(
+                                color: AppColors.mediumBlue.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(12),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(color: AppColors.whitePrimary),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: CupertinoButton(
+                                color: AppColors.mediumBlue,
+                                borderRadius: BorderRadius.circular(12),
+                                onPressed: () {
+                                  setState(() {
+                                    final trimmed = nameController.text.trim();
+                                    _userName = trimmed.isEmpty ? 'User' : trimmed;
+                                    _selectedOverlayIndex = tempOverlayIndex;
+                                    _overlayIntensity = tempIntensity;
+                                  });
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text(
+                                  'Save',
+                                  style: TextStyle(color: AppColors.whitePrimary),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    ).whenComplete(() => nameController.dispose());
   }
   
   @override
@@ -65,41 +313,106 @@ class _ProfileScreenState extends State<ProfileScreen>
                 // Profile Photo
                 Hero(
                   tag: 'profile_avatar',
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: AppColors.navyToBlueGradient,
-                      border: Border.all(
-                        color: AppColors.lightGrayAccent.withOpacity(0.3),
-                        width: 3,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.mediumBlue.withOpacity(0.5),
-                          blurRadius: 30,
-                          offset: const Offset(0, 10),
+                  child: GestureDetector(
+                    onTap: _showEditProfileSheet,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: AppColors.navyToBlueGradient,
+                            border: Border.all(
+                              color: AppColors.lightGrayAccent.withOpacity(0.3),
+                              width: 3,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppColors.mediumBlue.withOpacity(0.5),
+                                blurRadius: 30,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                          ),
+                          child: ClipOval(
+                            child: Stack(
+                              children: [
+                                Image.asset(
+                                  'assets/player.jpeg',
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    gradient: _buildCurrentOverlayGradient(null, null),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: -6,
+                          right: 6,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: AppColors.mediumBlue,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: AppColors.lightGrayAccent.withOpacity(0.8),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.mediumBlue.withOpacity(0.4),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              CupertinoIcons.pencil,
+                              color: AppColors.whitePrimary,
+                              size: 16,
+                            ),
+                          ),
                         ),
                       ],
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/player.jpeg',
-                        fit: BoxFit.cover,
-                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
                 // Username
-                const Text(
-                  'Alex Storm',
-                  style: TextStyle(
-                    color: AppColors.whitePrimary,
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        _userName,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: AppColors.whitePrimary,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      minSize: 0,
+                      onPressed: _showEditProfileSheet,
+                      child: const Icon(
+                        CupertinoIcons.pencil_circle_fill,
+                        color: AppColors.lightGrayAccent,
+                        size: 26,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
                 // Favorite Sport

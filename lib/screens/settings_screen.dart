@@ -17,6 +17,8 @@ class _SettingsScreenState extends State<SettingsScreen>
   bool _hapticsEnabled = true;
   double _themeIntensity = 0.7;
   int _selectedColorIndex = 0;
+  bool _soundEffectsEnabled = false;
+  bool _weeklySummaryEnabled = false;
   
   final List<Color> _paletteColors = [
     AppColors.deepNavy,
@@ -275,6 +277,138 @@ class _SettingsScreenState extends State<SettingsScreen>
                           setState(() => _hapticsEnabled = value);
                         },
                         activeColor: _getCardColor(),
+                      ),
+                    ],
+                  ),
+                ),
+                // Sound Effects Toggle
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: cardGradient,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: accentColor.withOpacity(0.2 * _themeIntensity + 0.2),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _getActiveColor().withOpacity(0.3 * _themeIntensity),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                CupertinoIcons.volume_up,
+                                color: accentColor,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 16),
+                              Text(
+                                'Sound Effects',
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          CupertinoSwitch(
+                            value: _soundEffectsEnabled,
+                            onChanged: (value) {
+                              setState(() => _soundEffectsEnabled = value);
+                            },
+                            activeColor: _getCardColor(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        _soundEffectsEnabled
+                            ? 'Immersive haptics paired with subtle sonic cues.'
+                            : 'Sound feedback is currently muted.',
+                        style: TextStyle(
+                          color: accentColor,
+                          fontSize: 13,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Weekly Summary Toggle
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: cardGradient,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: accentColor.withOpacity(0.2 * _themeIntensity + 0.2),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: _getActiveColor().withOpacity(0.3 * _themeIntensity),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                CupertinoIcons.chart_bar_alt_fill,
+                                color: accentColor,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 16),
+                              Text(
+                                'Weekly Storm Summary',
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          CupertinoSwitch(
+                            value: _weeklySummaryEnabled,
+                            onChanged: (value) {
+                              setState(() => _weeklySummaryEnabled = value);
+                            },
+                            activeColor: _getCardColor(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        _weeklySummaryEnabled
+                            ? 'Receive curated insights, stats, and highlights every Sunday.'
+                            : 'Enable to receive curated weekly recaps.',
+                        style: TextStyle(
+                          color: accentColor,
+                          fontSize: 13,
+                          height: 1.4,
+                        ),
                       ),
                     ],
                   ),
